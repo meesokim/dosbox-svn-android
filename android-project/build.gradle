@@ -1,0 +1,64 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+apply plugin: 'com.android.application'
+
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        //jcenter()
+	//mavenCentral()
+	jcenter {
+	   url "http://jcenter.bintray.com"
+	}
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.2.3'
+    }
+}
+
+allprojects {
+    repositories {
+	jcenter()
+    }
+
+}
+android {
+    compileSdkVersion 21
+    buildToolsVersion "25.0.1"
+	ext.gameTitle = "."
+	
+    if ( project.hasProperty("game") ) {
+        ext.gameTitle = game
+    }	
+   
+    defaultConfig {
+        applicationId "com.dosbox."+android.gameTitle
+        minSdkVersion 10
+        targetSdkVersion 17
+		if (android.gameTitle != ".") {
+			setProperty("archivesBaseName", android.gameTitle)
+		}
+        ndk {
+            moduleName 'main'
+        }
+
+    }
+
+    lintOptions {
+		abortOnError false
+    }
+
+    sourceSets.main {
+		manifest.srcFile android.gameTitle+'/AndroidManifest.xml'
+		jniLibs.srcDirs =['libs']
+		java.srcDirs = [android.gameTitle+'/src', 'src_sdl']
+		res.srcDirs = [android.gameTitle+'/res']
+		assets.srcDirs = [android.gameTitle+'/assets']
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
